@@ -1,0 +1,57 @@
+Exercise 1
+mysql> create database AddressBook;
+mysql> use AddressBook;
+mysql> create table Account(`id` int auto_increment primary key, `email` varchar(255), `password` varchar(40), `createdOn` datetime, `modifiedOn` datetime);mysql> create table addressBook(`bookId` int auto_increment primary key, `acctId` int, `name` varchar(255), `createdOn` datetime, `modifiedOn` datetime);
+mysql> create table AddressBook(`id` int auto_increment primary key, `accountId` int, `name` varchar(255), `createdOn` datetime, `modifiedOn` datetime);
+mysql> create table Entry(`id` int auto_increment primary key, `AddressBookId` int, `firstName`varchar(255), `lastName` varchar(255), `birthday` datetime, `type` enum('phone', 'address', 'email'));mysql> create table phone(`phoneId` int auto_increment primary key, `entryId` int, `type` enum('home', 'work', 'other'), `subtype` enum('landline', 'cell', 'fax'), `content` varchar(255));
+mysql> create table Phone(`id` int auto_increment primary key, `entryId` int, `type` enum('home', 'work', 'other'), `subtype` enum('landline', 'cellular', 'fax'), `content` varchar(255));
+mysql> create table Address(`id` int auto_increment primary key, `entryId` int, `type` enum('home', 'work', 'other'), `addressLine1` varchar(255), `addressLine2` varchar(255), `city` varchar(255), `province` varchar(128), `country` varchar(128), `postalCode` varchar(10));
+mysql> create table ElectronicMail (`id` int auto_increment primary key, `entryId` int, `type` enum('home', 'work', 'other'), `content` varchar(255));
+mysql> alter table Entry modify `type` enum('phone', 'address', 'electronic-mail');
+
+Exercise 2
+mysql> source data/import-account.sql;
+mysql> source data/import-addressbook.sql;
+mysql> source data/import-entry.sql;
+
+Exercise 3
+mysql> select lower(country), count(*) from Address group by country order by count(*) desc;
+
+Exercise 4
+mysql> select concat(substring(firstName,1,length(firstName)-1), upper(substring(firstName,-1))) from Entry join AddressBook on Entry.AddressBookId=AddressBook.id where AddressBook.name = "Pharetra Ut Limited";
+
+Exercise 5
+mysql> select * from Entry join ElectronicMail on Entry.id=ElectronicMail.entryId join AddressBook on Entry.AddressBookId =AddressBook.Id where AddressBookId=100;
+
+Exercise 6
+mysql> select content from Phone join Entry  on Phone.entryId = Entry.id where lastName='Jenkins' AND firstName='Charlotte';
+
+Exercise 7
+mysql> select distinct substring(content, locate('@', content)+1) from ElectronicMail;
+
+Exercise 8
+mysql> select * from Entry join Phone on Entry.id=Phone.entryId where (subtype = 'landline' OR subtype= 'cellular' OR subtype='fax') AND (birthday >'1950-10-01' AND birthday < '1960-09-30');
+
+Exercise 9
+mysql> select Account.id from Account join AddressBook on Account.id=AddressBook.accountId join Entry on AddressBook.id=Entry.AddressBookId join Phone on Entry.id=Phone.entryId where content like '_-%' group by Account.id;
+
+Exercise 10
+mysql> select * from Entry where (hour(birthday)=20) AND (month(birthday)!=2);
+
+Exercise 11
+mysql> select city from Address where country = 'Canada' OR country = 'Austria' OR country = 'Isle of Man' OR country= 'Ireland' OR country = 'Japan' group by city;
+
+Exercise 12
+mysql> select substring(content, -15,1) as 'country code', substring(content,-13,3) as 'area code', substring(content, -9) as 'line number' from Phone limit 100;
+
+Exercise 13
+mysql> select datediff(createdOn, modifiedOn) from AddressBook;
+
+Exercise 14
+mysql> select insert(insert( insert((replace(reverse(content), '-','')),2,0,'-'), 6, 0, '-'),10,0,'-') from Phone where subtype='fax';
+
+Exercise 15
+mysql> update ElectronicMail set type = case when type = 'home' then 'work' when type = 'work' then 'home' end where type in ('work', 'home');
+
+Exercise 16
+Randomize the civic number of 10 "other" addresses whose primary key value ranges between 715 and 800
